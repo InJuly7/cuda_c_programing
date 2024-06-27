@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/matrix_sum.dir/matrix_sum_generated_matrix_sum.cu.o -o matrix_sum  /usr/local/cuda-10.2/lib64/libcudart_static.a -ldl -lrt -lpthread 

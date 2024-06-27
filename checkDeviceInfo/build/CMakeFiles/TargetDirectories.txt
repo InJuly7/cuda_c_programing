@@ -1,0 +1,3 @@
+/usr/local/data/program/Tingshuo/cuda_c_programming/checkDeviceInfo/build/CMakeFiles/checkDeviceInfo.dir
+/usr/local/data/program/Tingshuo/cuda_c_programming/checkDeviceInfo/build/CMakeFiles/edit_cache.dir
+/usr/local/data/program/Tingshuo/cuda_c_programming/checkDeviceInfo/build/CMakeFiles/rebuild_cache.dir

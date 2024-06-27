@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/sumArray.dir/sumArray_generated_sumArray.cu.o -o sumArray  /usr/local/cuda-10.2/lib64/libcudart_static.a -ldl -lrt -lpthread 

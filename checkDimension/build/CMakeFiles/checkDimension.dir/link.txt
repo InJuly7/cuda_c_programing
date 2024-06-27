@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/checkDimension.dir/checkDimension_generated_checkDimension.cu.o -o checkDimension  /usr/local/cuda-10.2/lib64/libcudart_static.a -ldl -lrt -lpthread 

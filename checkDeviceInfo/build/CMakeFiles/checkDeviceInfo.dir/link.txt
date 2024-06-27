@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/checkDeviceInfo.dir/checkDeviceInfo_generated_checkDeviceInfo.cu.o -o checkDeviceInfo  /usr/local/cuda-10.2/lib64/libcudart_static.a -ldl -lrt -lpthread 
