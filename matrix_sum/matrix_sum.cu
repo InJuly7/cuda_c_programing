@@ -5,15 +5,9 @@
 #include "../verify_kernel/verify_kernel.h"
 #include "../kernel/kernel.cuh"
 
-
+#define RUN_KERNEL 3
 int main(int argc, char **argv)
 { 
-    // if (argc < 3)
-    // {
-    //     std::cerr << "Usage: " << argv[0] << " <blockdim_x> <blockdim_y>\n";
-    //     return 1;
-    // }
-
     printf("%s Starting...\n", argv[0]); 
     // set up device 
     int dev = 0;
@@ -60,12 +54,12 @@ int main(int argc, char **argv)
     cudaMemcpy(d_MatB, h_B, nBytes, cudaMemcpyHostToDevice);
     cudaDeviceSynchronize(); 
 
-     
-    // int blockdim_x = std::stoi(argv[1]); 
-    // int blockdim_y = std::stoi(argv[2]);
     int blockdim_x[] = {1, 16, 32, 64, 128, 256, 512, 1024};
     int blockdim_y[] = {1, 16, 32, 64, 128, 256, 512, 1024};
-    MatrixSum_grid2d_block2d <<< 16, 16 >>>(d_MatA, d_MatB, d_MatC, nx, ny); 
+    MatrixSum_grid2d_block2d <<< 16, 16 >>>(d_MatA, d_MatB, d_MatC, nx, ny);
+
+#if RUN_KERNEL == 1
+// grid2D block2D
     for(int i = 0;i < sizeof(blockdim_x) / sizeof(blockdim_x[0]); i++)
     {
         for(int j = 0;j < sizeof(blockdim_y)/sizeof(blockdim_y[0]); j++)
@@ -91,8 +85,54 @@ int main(int argc, char **argv)
             checkResult(hostRef, gpuRef, nxy); 
         }
     }
-    
-    
+#elif RUN_KERNEL == 2
+// grid1D block1D 
+    for(int i = 0;i < sizeof(blockdim_x) / sizeof(blockdim_x[0]); i++)
+    {
+            dim3 block(blockdim_x[i],1); 
+            dim3 grid((nx+block.x-1)/block.x,1);
+
+            if(!((block.x*block.y*block.z <= 1024) && 
+                (block.x<=1024) && 
+                (block.y<=1024) && 
+                (block.z<=64) && 
+                (grid.y<=65535) &&
+                (grid.z<=65535))) continue;
+            
+            auto start_3 = std::chrono::high_resolution_clock::now();
+            MatrixSum_grid1d_block1d <<< grid, block >>>(d_MatA, d_MatB, d_MatC, nx, ny); 
+            cudaDeviceSynchronize();
+            auto end_3 = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> elapsed_3 = end_3 - start_3;
+            printf("MatrixSum_grid1d_block1d <<<(%d,%d), (%d,%d)>>> elapsed %f milliseconds  ", 
+                                                            grid.x, grid.y, block.x, block.y, elapsed_3.count()); 
+            cudaMemcpy(gpuRef, d_MatC, nBytes, cudaMemcpyDeviceToHost); 
+            checkResult(hostRef, gpuRef, nxy); 
+        }
+#elif RUN_KERNEL == 3
+// grid2D block1D
+    for(int i = 0;i < sizeof(blockdim_x) / sizeof(blockdim_x[0]); i++)
+    {
+        dim3 block(blockdim_x[i], 1); 
+        dim3 grid((nx+block.x-1)/block.x, (ny+block.y-1)/block.y);
+        if(!((block.x*block.y*block.z <= 1024) && 
+            (block.x<=1024) && 
+            (block.y<=1024) && 
+            (block.z<=64) && 
+            (grid.y<=65535) &&
+            (grid.z<=65535))) continue;
+        
+        auto start_3 = std::chrono::high_resolution_clock::now();
+        MatrixSum_grid2d_block2d <<< grid, block >>>(d_MatA, d_MatB, d_MatC, nx, ny); 
+        cudaDeviceSynchronize();
+        auto end_3 = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> elapsed_3 = end_3 - start_3;
+        printf("MatrixSum_grid2d_block2d <<<(%d,%d), (%d,%d)>>> elapsed %f milliseconds  ", 
+                                                        grid.x, grid.y, block.x, block.y, elapsed_3.count()); 
+        cudaMemcpy(gpuRef, d_MatC, nBytes, cudaMemcpyDeviceToHost); 
+        checkResult(hostRef, gpuRef, nxy); 
+    }
+#endif
     // cudaMemcpy(gpuRef, d_MatC, nBytes, cudaMemcpyDeviceToHost); 
     // checkResult(hostRef, gpuRef, nxy); 
     

@@ -53,10 +53,12 @@ int main(int argc, char **argv)
     printf(" Memory Bus Width: %d-bit\n", 
             deviceProp.memoryBusWidth);
 
-    if (deviceProp.l2CacheSize)
-    {
-        printf(" L2 Cache Size: %d bytes\n", deviceProp.l2CacheSize);
-    }
+
+	if (deviceProp.l2CacheSize)
+	{
+		printf(" L2 Cache Size: %d bytes\n", deviceProp.l2CacheSize);
+	}
+
 
     // 显示纹理尺寸
     printf(" Max Texture Dimension Size (x,y,z) 1D=(%d), 2D=(%d,%d), 3D=(%d,%d,%d)\n", 
